@@ -27,19 +27,22 @@ window.addEventListener('load', function () {
     var generate = document.getElementById('nl2goGenerateButton'),
         code = document.getElementById('code'),
         codeLoader = document.getElementById('codeLoader'),
-        connect = document.getElementById('nl2goConnectButton');
+        connect = document.getElementById('nl2goConnectButton'),
+        orderTrackingOn = document.getElementById('nl2goOrderTracking_on'),
+        orderTrackingOff = document.getElementById('nl2goOrderTracking_off');
 
     connect.addEventListener('click', function () {
-        var baseUrl = 'https://ui.newsletter2go.com/integrations/connect/PS/',
+        var baseUrl = 'https://ui-sandbox.newsletter2go.com/integrations/connect/PS/',
             params = {
                 //ignore version to create latest version of connector
                 //version: document.getElementById("version").value,
                 apiKey: code.value,
                 language: document.getElementById('language').value,
-                url: document.getElementById('base_url').value
+                url: document.getElementById('base_url').value,
+                callback: document.getElementById("callback_url").value
             };
 
-        window.open(baseUrl + '?' + 'version=' + params.version + '&' + 'apiKey=' + params.apiKey + '&' + 'language=' + params.language + '&' + 'url=' + params.url, '_blank');
+        window.open(baseUrl + '?' + $.param(params), '_blank');
     });
 
     generate.addEventListener('click', function ajax() {
@@ -58,6 +61,24 @@ window.addEventListener('load', function () {
                 code.style.display = 'block';
             }
         };
+
+        xmlHttp.open('POST', 'index.php', true);
+        xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xmlHttp.send(parameters);
+    });
+
+    orderTrackingOn.addEventListener('click', function ajax() {
+        var xmlHttp = new XMLHttpRequest(),
+            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=trackingOrder&enable=1';
+
+        xmlHttp.open('POST', 'index.php', true);
+        xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xmlHttp.send(parameters);
+    });
+
+    orderTrackingOff.addEventListener('click', function ajax() {
+        var xmlHttp = new XMLHttpRequest(),
+            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=trackingOrder&enable=0';
 
         xmlHttp.open('POST', 'index.php', true);
         xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');

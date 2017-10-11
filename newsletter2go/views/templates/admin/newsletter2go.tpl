@@ -78,10 +78,34 @@
                 <div class="col-lg-9">
                     <input type="hidden" id="language" value="{$lang_iso|escape:'htmlall':'UTF-8'}">
                     <input type="hidden" id="base_url" value="{$base_url|escape:'htmlall':'UTF-8'}">
+                    <input type="hidden" id="callback_url" value="{$callback_url|escape:'htmlall':'UTF-8'}">
                     <input type="hidden" id="version" value="{$plugin_version|escape:'htmlall':'UTF-8'}">
                     <button type="button" class="btn btn-default" id="nl2goConnectButton">
                         {l s='connect' mod='newsletter2go'}
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-horizontal">
+    <div class="panel">
+        <div class="panel-heading"><i class="icon-cogs" style="margin-right: 10px"></i>{l s='Conversion Tracking' mod='newsletter2go'}</div>
+        <div class="form-wrapper">
+            <div class="form-group">
+                <label class="control-label col-lg-3" style="text-align: right;">
+                    <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="">
+                        {l s='Enable order tracking' mod='newsletter2go'}
+                    </span>
+                </label>
+                <div class="col-lg-9">
+                    <span class="switch prestashop-switch fixed-width-lg">
+                        <input type="radio" name="nl2goOrderTracking" id="nl2goOrderTracking_on" value="1" {if $enable_tracking}checked="checked"{/if}>
+                        <label for="nl2goOrderTracking_on" class="radioCheck">{l s='Yes'}</label>
+                        <input type="radio" name="nl2goOrderTracking" id="nl2goOrderTracking_off" value="0" {if !$enable_tracking}checked="checked"{/if}>
+                        <label for="nl2goOrderTracking_off" class="radioCheck">{l s='No'}</label>
+                        <a class="slide-button btn"></a>
+                    </span>
                 </div>
             </div>
         </div>

@@ -26,6 +26,8 @@
 
 class Newsletter2Go extends Module
 {
+    const CONFIG = array('API_KEY', 'API_ACCOUNT', 'AUTH_KEY', 'ACCESS_TOKEN', 'REFRESH_TOKEN', 'COMPANY_ID', 'TRACKING_ORDER');
+
     public function __construct()
     {
         $this->module_key = '0372c81a8fe76ebddb8ec637278afe98';
@@ -36,7 +38,7 @@ class Newsletter2Go extends Module
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->bootstrap = true;
-        $this->controllers = array('Export');
+        $this->controllers = array('Export', 'Callback');
         parent::__construct();
         $this->displayName = $this->l('Newsletter2Go email marketing');
         $this->description = $this->l('Adds email marketing functionality to your E-commerce platform. Easily synchronize your contacts and send product newsletters');
@@ -65,7 +67,10 @@ class Newsletter2Go extends Module
             $db->update('tab', array('icon' => 'sms'), 'id_tab = ' . $tab->id);
         }
 
-        return parent::install() && $this->registerUrls() && $this->registerHook('backOfficeHeader');
+        return parent::install()
+            && $this->registerUrls()
+            && $this->registerHook('backOfficeHeader')
+            && $this->registerHook('displayOrderConfirmation');
     }
 
     public function uninstall()
@@ -76,8 +81,7 @@ class Newsletter2Go extends Module
         $db_instance->update('webservice_account', array('active' => '0'), 'id_webservice_account = ' . $account_id);
 
         // Remove values from configuration
-        Configuration::deleteByName('NEWSLETTER2GO_API_KEY');
-        Configuration::deleteByName('NEWSLETTER2GO_API_ACCOUNT');
+        $this->deleteConfig();
 
         $tab = new Tab((int)Tab::getIdFromClassName('Newsletter2GoTab'));
         $tab->delete();
@@ -90,6 +94,19 @@ class Newsletter2Go extends Module
         $param = md5(time());
         $this->context->controller->addJS($this->_path . 'views/js/nl2go_script.js?param=' . $param, false);
         $this->context->controller->addCSS($this->_path . 'views/css/menuTabIcon.css?param=' . $param, 'all', null, false);
+    }
+
+    /**
+     *  Hook for new order creation
+     *
+     * @param $params
+     */
+    public function hookDisplayOrderConfirmation($params)
+    {
+        $companyId = Configuration::get('NEWSLETTER2GO_COMPANY_ID');
+        if (!empty($companyId) && Configuration::get('NEWSLETTER2GO_TRACKING_ORDER') === '1') {
+            echo $this->getTrackingScript($params['order'], $companyId);
+        }
     }
 
     /**
@@ -113,5 +130,67 @@ class Newsletter2Go extends Module
 
         return true;
     }
-	
+
+    /**
+     * Delete values from config
+     */
+    private function deleteConfig()
+    {
+        foreach (self::CONFIG as $configName) {
+            Configuration::deleteByName("NEWSLETTER2GO_$configName");
+        }
+    }
+
+    /**
+     * Create tracking script with order information
+     *
+     * @param $order
+     * @param $companyId
+     * @return string
+     */
+    private function getTrackingScript($order, $companyId)
+    {
+        $shop = $this->context->shop->getShop($order->id_shop);
+        $transactionData = [
+            'id' => (string)$order->id,
+            'affiliation' => (string)$shop['name'],
+            'revenue' => (string)round($order->total_paid, 2),
+            'shipping' => (string)round($order->total_shipping, 2),
+            'tax' => (string)round($order->total_paid - $order->total_paid_tax_excl, 2)
+        ];
+
+        $script = '<script id="n2g_script"> 
+            !function(e,t,n,c,r,a,i){ 
+                e.Newsletter2GoTrackingObject=r, 
+                e[r]=e[r]||function(){(e[r].q=e[r].q||[]).push(arguments)}, 
+                e[r].l=1*new Date, 
+                a=t.createElement(n), 
+                i=t.getElementsByTagName(n)[0], 
+                a.async=1, 
+                a.src=c, 
+                i.parentNode.insertBefore(a,i) 
+            } 
+            (window,document,"script","//static-sandbox.newsletter2go.com/utils.js","n2g"); 
+            n2g(\'create\', \'' . $companyId . '\'); 
+            n2g(\'ecommerce:addTransaction\', ' . json_encode($transactionData) . ');';
+
+        foreach ($order->getProducts() as $product) {
+            $category = new Category($product['id_category_default'], $order->id_lang);
+            $productData = [
+                'id' => (string)$product['id_order'],
+                'name' => (string)$product['product_name'],
+                'sku' => (string)$product['reference'],
+                'category' => (string)$category->name,
+                'price' => (string)round($product['total_wt'], 2),
+                'quantity' => (string)$product['product_quantity']
+            ];
+
+            $script .= " 
+            n2g('ecommerce:addItem', " . json_encode($productData) . ");";
+        }
+
+        return $script . ' 
+            n2g(\'ecommerce:send\') 
+        </script>';
+    }
 }

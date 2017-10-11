@@ -59,6 +59,8 @@ class Newsletter2GoTabController extends AdminController
 
         $version = $this->getPluginVersion();
 
+        $enableTracking = Configuration::get('NEWSLETTER2GO_TRACKING_ORDER');
+
         $this->context->smarty->assign(array(
             'web_services_api_key' => $api_key,
             'plugin_version' => $version,
@@ -66,6 +68,8 @@ class Newsletter2GoTabController extends AdminController
             'show_page_header_toolbar' => $this->show_page_header_toolbar,
             'page_header_toolbar_title' => $this->page_header_toolbar_title,
             'page_header_toolbar_btn' => $this->page_header_toolbar_btn,
+            'callback_url' => $this->context->link->getModuleLink('newsletter2go', 'Callback'),
+            'enable_tracking' => isset($enableTracking) && $enableTracking === '1'
         ));
 
         $this->setTemplate('newsletter2go.tpl');
@@ -149,6 +153,13 @@ class Newsletter2GoTabController extends AdminController
         $api_key = $this->createNewServiceAccount();
 
         die($api_key);
+    }
+
+    public function ajaxProcessTrackingOrder()
+    {
+        Configuration::updatevalue('NEWSLETTER2GO_TRACKING_ORDER', Tools::getValue('enable', '0'));
+
+        die();
     }
 
     /**
