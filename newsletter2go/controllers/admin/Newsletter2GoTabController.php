@@ -84,6 +84,7 @@ class Newsletter2GoTabController extends AdminController
 
     public function checkAccess()
     {
+        $this->context->controller->addJquery();
         return true;
     }
 
