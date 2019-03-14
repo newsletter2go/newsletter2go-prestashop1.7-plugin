@@ -33,10 +33,10 @@ class Newsletter2Go extends Module
         $this->module_key = '0372c81a8fe76ebddb8ec637278afe98';
         $this->name = 'newsletter2go';
         $this->tab = 'advertising_marketing';
-        $this->version = '4.0.01';
+        $this->version = '4.0.00';
         $this->author = 'Newsletter2Go';
         $this->need_instance = 0;
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->bootstrap = true;
         $this->controllers = array('Export', 'Callback');
         parent::__construct();
