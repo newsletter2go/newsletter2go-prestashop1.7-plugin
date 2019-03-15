@@ -32,7 +32,7 @@ window.addEventListener('load', function () {
         orderTrackingOff = document.getElementById('nl2goOrderTracking_off');
 
     connect.addEventListener('click', function () {
-        var baseUrl = 'https://ui-sandbox.newsletter2go.com/integrations/connect/PS/',
+        var baseUrl = 'https://ui.newsletter2go.com/integrations/connect/PS17/',
             params = {
                 //ignore version to create latest version of connector
                 //version: document.getElementById("version").value,

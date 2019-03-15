@@ -26,17 +26,17 @@
 
 class Newsletter2Go extends Module
 {
-    const CONFIG = array('API_KEY', 'API_ACCOUNT', 'AUTH_KEY', 'ACCESS_TOKEN', 'REFRESH_TOKEN', 'COMPANY_ID', 'TRACKING_ORDER');
+    private $configNames = array('API_KEY', 'API_ACCOUNT', 'AUTH_KEY', 'ACCESS_TOKEN', 'REFRESH_TOKEN', 'COMPANY_ID', 'TRACKING_ORDER');
 
     public function __construct()
     {
         $this->module_key = '0372c81a8fe76ebddb8ec637278afe98';
         $this->name = 'newsletter2go';
         $this->tab = 'advertising_marketing';
-        $this->version = '4.0.01';
+        $this->version = '4.0.00';
         $this->author = 'Newsletter2Go';
         $this->need_instance = 0;
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->bootstrap = true;
         $this->controllers = array('Export', 'Callback');
         parent::__construct();
@@ -136,7 +136,7 @@ class Newsletter2Go extends Module
      */
     private function deleteConfig()
     {
-        foreach (self::CONFIG as $configName) {
+        foreach ($this->configNames as $configName) {
             Configuration::deleteByName("NEWSLETTER2GO_$configName");
         }
     }
@@ -170,7 +170,7 @@ class Newsletter2Go extends Module
                 a.src=c, 
                 i.parentNode.insertBefore(a,i) 
             } 
-            (window,document,"script","//static-sandbox.newsletter2go.com/utils.js","n2g"); 
+            (window,document,"script","//static.newsletter2go.com/utils.js","n2g"); 
             n2g(\'create\', \'' . $companyId . '\'); 
             n2g(\'ecommerce:addTransaction\', ' . json_encode($transactionData) . ');';
 

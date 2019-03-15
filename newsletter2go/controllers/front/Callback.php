@@ -46,7 +46,7 @@ class Newsletter2GoCallbackModuleFrontController extends ModuleFrontController
             Configuration::updateValue('NEWSLETTER2GO_REFRESH_TOKEN', $refreshToken);
         }
 
-        if (!empty($refreshToken)) {
+        if (!empty($companyId)) {
             Configuration::updateValue('NEWSLETTER2GO_COMPANY_ID', $companyId);
         }
 
