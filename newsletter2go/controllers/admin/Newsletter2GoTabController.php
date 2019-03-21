@@ -34,6 +34,7 @@ class Newsletter2GoTabController extends AdminController
         $this->bootstrap = true;
         $this->className = 'Configuration';
         $this->table = 'configuration';
+        $this->name = 'newsletter2go';
 
         parent::__construct();
     }
@@ -77,9 +78,7 @@ class Newsletter2GoTabController extends AdminController
 
     public function createTemplate($tpl_name)
     {
-        $path = dirname(__FILE__) . DS . '..' . DS . '..' . DS . 'views' . DS . 'templates' . DS . 'admin' . DS;
-
-        return $this->context->smarty->createTemplate($path . $tpl_name, $this->context->smarty);
+        return $this->context->smarty->createTemplate(_PS_MODULE_DIR_ . $this->name . '/views/templates/admin/' . $tpl_name, $this->context->smarty);
     }
 
     public function checkAccess()
