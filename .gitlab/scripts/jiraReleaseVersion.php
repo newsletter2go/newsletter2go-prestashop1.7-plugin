@@ -18,11 +18,11 @@ const LABEL_PREFIX = 'global';
  * Time: 14:44
  */
 
-$version = 'PS17_4_0_02';
-$isPlugin = 'YES';
-$isConnector = 'NO';
-$fullname = 'PrestaShop17';
-$abbreviation = 'PS17';
+$version = $argv[1];
+$isPlugin = $argv[2];
+$isConnector = $argv[3];
+$fullname = $argv[4];
+$abbreviation = $argv[5];
 
 
 function getJiraClient(){
