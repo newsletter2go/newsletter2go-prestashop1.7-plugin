@@ -26,7 +26,7 @@ make_file:
 
 update_jira:
   stage: deploy
-  script: updateJira.sh
+  script: .gitlab/updateJira.sh
   when: manual
 
 
