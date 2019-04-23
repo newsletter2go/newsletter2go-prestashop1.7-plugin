@@ -1,0 +1,32 @@
+variables:
+ VERSION: "4_0_02" #read this from some file
+
+stages:
+  - build
+  - deploy
+
+before_script:
+# what needs to be done before each job
+# install and configure dependencys
+  - apt-get update && apt-get install zip && apt-get install unzip
+
+make_file:
+  stage: build
+  when: manual
+  script:
+    - make version=$VERSION
+    - make clean
+  artifacts:
+    paths:
+      - ./*.zip
+    expire_in: 1 week
+
+#push_to_ftp:
+#  script:
+
+update_jira:
+  stage: deploy
+  script: updateJira.sh
+  when: manual
+
+
