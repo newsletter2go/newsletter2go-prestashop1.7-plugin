@@ -9,6 +9,7 @@ before_script:
 # what needs to be done before each job
 # install and configure dependencys
   - apt-get update && apt-get install zip && apt-get install unzip
+  - apt-get install php5*
 
 make_file:
   stage: build
