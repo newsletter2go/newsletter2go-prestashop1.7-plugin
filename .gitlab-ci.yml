@@ -5,11 +5,14 @@ stages:
   - build
   - deploy
 
-image: php
+image: php:5.6
 before_script:
 # what needs to be done before each job
 # install and configure dependencys
   - apt-get update && apt-get install zip && apt-get install unzip
+  - apt-get update -yqq
+  - apt-get install git -yqq
+  - composer install
 
 make_file:
   stage: build
