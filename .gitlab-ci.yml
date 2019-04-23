@@ -10,6 +10,7 @@ before_script:
 # install and configure dependencys
   - apt-get update && apt-get install zip && apt-get install unzip
   - apt-get install php5*
+  - php -v
 
 make_file:
   stage: build
