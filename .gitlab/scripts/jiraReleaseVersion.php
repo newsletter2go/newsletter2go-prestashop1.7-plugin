@@ -4,7 +4,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 
 const JIRA_INTEGRATION = '22282279';
-const JIRA_PROJECT_KEY = 'SI';
+const JIRA_PROJECT_KEY = 'INT';
 const CONFLUENCE_SPACEKEY = 'IT';
 const GOOGLE_INTEGRATION = '0B9iwLT_tdQIiOFYwMTkzV1hkalU';
 const GROUP = 'it@newsletter2go.com';
