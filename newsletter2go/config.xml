@@ -2,7 +2,7 @@
 <module>
 	<name>newsletter2go</name>
 	<displayName><![CDATA[Newsletter2Go email marketing]]></displayName>
-	<version><![CDATA[4.0.00]]></version>
+	<version><![CDATA[4.0.02]]></version>
 	<description><![CDATA[Adds email marketing functionality to your E-commerce platform. Easily synchronize your contacts and send product newsletters]]></description>
 	<author><![CDATA[Newsletter2Go]]></author>
 	<tab><![CDATA[advertising_marketing]]></tab>
