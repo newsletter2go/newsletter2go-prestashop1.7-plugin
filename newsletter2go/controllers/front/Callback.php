@@ -33,6 +33,7 @@ class Newsletter2GoCallbackModuleFrontController extends ModuleFrontController
         $accessToken = Tools::getValue('access_token', 0);
         $refreshToken = Tools::getValue('refresh_token', 0);
         $companyId = Tools::getValue('company_id', 0);
+        $userIntegrationId = Tools::getValue('userIntegratio_id', 0);
 
         if (!empty($authKey)) {
             Configuration::updateValue('NEWSLETTER2GO_AUTH_KEY', $authKey);
@@ -48,6 +49,10 @@ class Newsletter2GoCallbackModuleFrontController extends ModuleFrontController
 
         if (!empty($companyId)) {
             Configuration::updateValue('NEWSLETTER2GO_COMPANY_ID', $companyId);
+        }
+
+        if (!empty($userIntegrationId)) {
+            Configuration::updateValue('NEWSLETTER2GO_USERINTEGRATION_ID', $userIntegrationId);
         }
 
         die(json_encode(

@@ -111,3 +111,26 @@
         </div>
     </div>
 </div>
+<div class="form-horizontal">
+    <div class="panel">
+        <div class="panel-heading"><i class="icon-cogs" style="margin-right: 10px"></i>{l s='Add Product To Cart Tracking' mod='newsletter2go'}</div>
+        <div class="form-wrapper">
+            <div class="form-group">
+                <label class="control-label col-lg-3" style="text-align: right;">
+                    <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="">
+                        {l s='Enable Add Product to Cart tracking' mod='newsletter2go'}
+                    </span>
+                </label>
+                <div class="col-lg-9">
+                    <span class="switch prestashop-switch fixed-width-lg">
+                        <input type="radio" name="nl2goAddProductToCartTracking" id="nl2goAddProductToCartTracking_on" value="1" {if $enable_tracking}checked="checked"{/if}>
+                        <label for="nl2goAddProductToCartTracking_on" class="radioCheck">{l s='Yes'}</label>
+                        <input type="radio" name="nl2goAddProductToCartTracking" id="nl2goAddProductToCartTracking_off" value="0" {if !$enable_tracking}checked="checked"{/if}>
+                        <label for="nl2goAddProductToCartTracking_off" class="radioCheck">{l s='No'}</label>
+                        <a class="slide-button btn"></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -26,14 +26,14 @@
 
 class Newsletter2Go extends Module
 {
-    private $configNames = array('API_KEY', 'API_ACCOUNT', 'AUTH_KEY', 'ACCESS_TOKEN', 'REFRESH_TOKEN', 'COMPANY_ID', 'TRACKING_ORDER');
+    private $configNames = array('API_KEY', 'API_ACCOUNT', 'AUTH_KEY', 'ACCESS_TOKEN', 'REFRESH_TOKEN', 'COMPANY_ID', 'NEWSLETTER2GO_USERINTEGRATION_ID' , 'TRACKING_ORDER', 'ADD_PRODUCT_TO_CART');
 
     public function __construct()
     {
         $this->module_key = '0372c81a8fe76ebddb8ec637278afe98';
         $this->name = 'newsletter2go';
         $this->tab = 'advertising_marketing';
-        $this->version = '4.0.02';
+        $this->version = '4.1.00';
         $this->author = 'Newsletter2Go';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
