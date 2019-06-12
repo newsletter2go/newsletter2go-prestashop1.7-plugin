@@ -67,6 +67,9 @@ class Newsletter2Go extends Module
             $db->update('tab', array('icon' => 'sms'), 'id_tab = ' . $tab->id);
         }
 
+        $this->registerHook('actionCartSave');
+        $this->registerHook('actionObjectProductInCartDeleteAfter');
+
         return parent::install()
             && $this->registerUrls()
             && $this->registerHook('backOfficeHeader')
