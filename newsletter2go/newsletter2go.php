@@ -73,7 +73,19 @@ class Newsletter2Go extends Module
         return parent::install()
             && $this->registerUrls()
             && $this->registerHook('backOfficeHeader')
-            && $this->registerHook('displayOrderConfirmation');
+            && $this->registerHook('displayOrderConfirmation')
+            && $this->registerHook('actionCartSave')
+            && $this->registerHook('actionObjectProductInCartDeleteAfter');
+    }
+
+    public function hookActionCartSave($params)
+    {
+        // send the a hook to the microservice
+    }
+
+    public function hookActionObjectProductInCartDeleteAfter($params)
+    {
+        // send the a hook to the microservice
     }
 
     public function uninstall()
