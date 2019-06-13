@@ -70,7 +70,19 @@ class Newsletter2Go extends Module
         return parent::install()
             && $this->registerUrls()
             && $this->registerHook('backOfficeHeader')
-            && $this->registerHook('displayOrderConfirmation');
+            && $this->registerHook('displayOrderConfirmation')
+            && $this->registerHook('actionCartSave');
+    }
+
+    /*
+     * this hook will be triggered when:
+     * - a product is added to the cart
+     * - product amount is increased or decreased
+     * - a product is deleted
+     */
+    public function hookActionCartSave($params)
+    {
+//        echo json_encode($params);
     }
 
     public function uninstall()
