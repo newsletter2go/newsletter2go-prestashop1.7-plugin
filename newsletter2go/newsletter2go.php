@@ -26,7 +26,19 @@
 
 class Newsletter2Go extends Module
 {
-    private $configNames = array('API_KEY', 'API_ACCOUNT', 'AUTH_KEY', 'ACCESS_TOKEN', 'REFRESH_TOKEN', 'COMPANY_ID', 'NEWSLETTER2GO_USERINTEGRATION_ID' , 'TRACKING_ORDER', 'ADD_PRODUCT_TO_CART');
+    private $configNames = array(
+        'API_KEY',
+        'API_ACCOUNT',
+        'AUTH_KEY',
+        'ACCESS_TOKEN',
+        'REFRESH_TOKEN',
+        'COMPANY_ID',
+        'NEWSLETTER2GO_USERINTEGRATION_ID' ,
+        'TRACKING_ORDER',
+        'ADD_PRODUCT_TO_CART',
+        'NEWSLETTER2GO_CART_INFOS',
+        'NEWSLETTER2GO_CART_PRODUCTS'
+    );
 
     public function __construct()
     {
@@ -79,11 +91,24 @@ class Newsletter2Go extends Module
      * - a product is added to the cart
      * - product amount is increased or decreased
      * - a product is deleted
+     * @param $params
      */
     public function hookActionCartSave($params)
     {
-//        echo json_encode($params);
+        $cart_info = json_encode($params);
+
+        if (Configuration::get('NEWSLETTER2GO_ADD_PRODUCT_TO_CART') === '1') {
+            Configuration::updateValue('NEWSLETTER2GO_CART_INFOS', $cart_info);
+        }else{
+            exit('Params were emtpy');
+        }
     }
+
+    public function reset()
+    {
+        //todo after reset our Plugin it´s not  able to be used or uninstalled
+    }
+
 
     public function uninstall()
     {
