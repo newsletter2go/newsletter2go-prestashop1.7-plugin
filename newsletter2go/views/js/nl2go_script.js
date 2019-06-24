@@ -30,8 +30,8 @@ window.addEventListener('load', function () {
         connect = document.getElementById('nl2goConnectButton'),
         orderTrackingOn = document.getElementById('nl2goOrderTracking_on'),
         orderTrackingOff = document.getElementById('nl2goOrderTracking_off'),
-        addProductToCartOn = document.getElementById('nl2goAddProductToCartTracking_on'),
-        addProductToCartOff = document.getElementById('nl2goAddProductToCartTracking_off');
+        abandonedShoppingCartOn = document.getElementById('nl2goAbandonedShoppingCart_on'),
+        abandonedShoppingCartOff = document.getElementById('nl2goAbandonedShoppingCart_off');
 
     connect.addEventListener('click', function () {
         var baseUrl = 'https://ui.newsletter2go.com/integrations/connect/PS17/',
@@ -87,18 +87,18 @@ window.addEventListener('load', function () {
         xmlHttp.send(parameters);
     });
 
-    addProductToCartOn.addEventListener('click', function ajax() {
+    abandonedShoppingCartOn.addEventListener('click', function ajax() {
         var xmlHttp = new XMLHttpRequest(),
-            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=addProductToCart&enable=1';
+            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=abandonedShoppingCart&enable=1';
 
         xmlHttp.open('POST', 'index.php', true);
         xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xmlHttp.send(parameters);
     });
 
-    addProductToCartOff.addEventListener('click', function ajax() {
+    abandonedShoppingCartOff.addEventListener('click', function ajax() {
         var xmlHttp = new XMLHttpRequest(),
-            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=addProductToCart&enable=0';
+            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=abandonedShoppingCart&enable=0';
 
         xmlHttp.open('POST', 'index.php', true);
         xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');

@@ -61,7 +61,7 @@ class Newsletter2GoTabController extends AdminController
         $version = $this->getPluginVersion();
 
         $enableTracking = Configuration::get('NEWSLETTER2GO_TRACKING_ORDER');
-        $enableAddProductToCart = Configuration::get('NEWSLETTER2GO_ADD_PRODUCT_TO_CART');
+        $enableAbandonedShoppingCart = Configuration::get('NEWSLETTER2GO_ABANDONED_SHOPPING_CART');
 
         $this->context->smarty->assign(array(
             'web_services_api_key' => $api_key,
@@ -72,7 +72,7 @@ class Newsletter2GoTabController extends AdminController
             'page_header_toolbar_btn' => $this->page_header_toolbar_btn,
             'callback_url' => $this->context->link->getModuleLink('newsletter2go', 'Callback'),
             'enable_tracking' => isset($enableTracking) && $enableTracking === '1',
-            'enable_add_product_to_cart' => isset($enableAddProductToCart) && $enableAddProductToCart === '1',
+            'enable_abandoned_shopping_cart' => isset($enableAbandonedShoppingCart) && $enableAbandonedShoppingCart === '1',
         ));
 
         $this->setTemplate('newsletter2go.tpl');
@@ -165,7 +165,7 @@ class Newsletter2GoTabController extends AdminController
 
     public function ajaxProcessAddProductToCart()
     {
-        Configuration::updatevalue('NEWSLETTER2GO_ADD_PRODUCT_TO_CART', Tools::getValue('enable', '0'));
+        Configuration::updatevalue('NEWSLETTER2GO_ABANDONED_SHOPPING_CART', Tools::getValue('enable', '0'));
 
         die();
     }

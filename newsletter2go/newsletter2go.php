@@ -33,11 +33,9 @@ class Newsletter2Go extends Module
         'ACCESS_TOKEN',
         'REFRESH_TOKEN',
         'COMPANY_ID',
-        'NEWSLETTER2GO_USERINTEGRATION_ID' ,
+        'NEWSLETTER2GO_USERINTEGRATION_ID',
         'TRACKING_ORDER',
-        'ADD_PRODUCT_TO_CART',
-        'NEWSLETTER2GO_CART_INFOS',
-        'NEWSLETTER2GO_CART_PRODUCTS'
+        'NEWSLETTER2GO_ABANDONED_SHOPPING_CART',
     );
 
     public function __construct()
@@ -53,7 +51,9 @@ class Newsletter2Go extends Module
         $this->controllers = array('Export', 'Callback');
         parent::__construct();
         $this->displayName = $this->l('Newsletter2Go email marketing');
-        $this->description = $this->l('Adds email marketing functionality to your E-commerce platform. Easily synchronize your contacts and send product newsletters');
+        $this->description = $this->l(
+            'Adds email marketing functionality to your E-commerce platform. Easily synchronize your contacts and send product newsletters'
+        );
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
         if (!Configuration::get('NEWSLETTER2GO_NAME')) {
             $this->warning = $this->l('No name provided');
@@ -67,9 +67,9 @@ class Newsletter2Go extends Module
         // Need a foreach for the language
         $tab->name[(int)Configuration::get('PS_LANG_DEFAULT')] = $this->l('Newsletter2Go');
         $tab->class_name = 'Newsletter2GoTab';
-		// Set parent tab id
+        // Set parent tab id
         $parent_id = (_PS_VERSION_ >= '1.7.0.0' ? (int)Tab::getIdFromClassName('CONFIGURE') : 0);
-		$tab->id_parent = $parent_id;
+        $tab->id_parent = $parent_id;
         $tab->module = $this->name;
         $tab->add();
 
@@ -95,12 +95,42 @@ class Newsletter2Go extends Module
      */
     public function hookActionCartSave($params)
     {
-        $cart_info = json_encode($params);
+        if (Configuration::get('NEWSLETTER2GO_ABANDONED_SHOPPING_CART') === '1') {
+            $cart = $params['cart'];
 
-        if (Configuration::get('NEWSLETTER2GO_ADD_PRODUCT_TO_CART') === '1') {
-            Configuration::updateValue('NEWSLETTER2GO_CART_INFOS', $cart_info);
-        }else{
-            exit('Params were emtpy');
+            if (isset($cart)) {
+
+                $shop = $this->context->shop->getShop($cart->id_shop);
+
+                $productData = [];
+
+                foreach ($cart->getProducts(true) as $products) {
+                    $product = [];
+                    $product[] = [
+                        'id' => (string)$products['id_product'],
+                        'quantity' => (string)$products['quantity']
+                    ];
+
+                    $productData = array_merge($productData, $product);
+                }
+
+                $customer = [];
+
+                if(isset($cart->id_customer) && $cart->id_customer != 0){
+                    $customer = $this->context->customer;
+                }
+
+                $cartData = [
+                    'id' => (string)$cart->id,
+                    'id_guest' => (string)$cart->id_guest,
+                    'shopName' => (string)$shop['name'],
+                    'shopUrl' => (string)$shop['domain'],
+                    'productData' => $productData,
+                    'customer' => $customer
+                ];
+
+                echo json_encode($cartData);
+            }
         }
     }
 
@@ -130,7 +160,12 @@ class Newsletter2Go extends Module
     {
         $param = md5(time());
         $this->context->controller->addJS($this->_path . 'views/js/nl2go_script.js?param=' . $param, false);
-        $this->context->controller->addCSS($this->_path . 'views/css/menuTabIcon.css?param=' . $param, 'all', null, false);
+        $this->context->controller->addCSS(
+            $this->_path . 'views/css/menuTabIcon.css?param=' . $param,
+            'all',
+            null,
+            false
+        );
     }
 
     /**
