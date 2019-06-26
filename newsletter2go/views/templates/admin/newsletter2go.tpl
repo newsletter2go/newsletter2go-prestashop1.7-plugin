@@ -113,22 +113,41 @@
 </div>
 <div class="form-horizontal">
     <div class="panel">
-        <div class="panel-heading"><i class="icon-cogs" style="margin-right: 10px"></i>{l s='Add Product To Cart Tracking' mod='newsletter2go'}</div>
+        <div class="panel-heading"><i class="icon-cogs" style="margin-right: 10px"></i>{l s='Abandoned Shopping Cart' mod='newsletter2go'}</div>
         <div class="form-wrapper">
             <div class="form-group">
                 <label class="control-label col-lg-3" style="text-align: right;">
                     <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="">
-                        {l s='Enable Add Product to Cart tracking' mod='newsletter2go'}
+                        {l s='Enable Abandoned Shopping Cart' mod='newsletter2go'}
                     </span>
                 </label>
                 <div class="col-lg-9">
                     <span class="switch prestashop-switch fixed-width-lg">
-                        <input type="radio" name="nl2goAbandonedShoppingCart" id="nl2goAbandonedShoppingCart_on" value="1" {if $enable_add_product_to_cart}checked="checked"{/if}>
+                        <input type="radio" name="nl2goAbandonedShoppingCart" id="nl2goAbandonedShoppingCart_on" value="1" {if $enable_abandoned_shopping_cart}checked="checked"{/if}>
                         <label for="nl2goAbandonedShoppingCart_on" class="radioCheck">{l s='Yes'}</label>
-                        <input type="radio" name="nl2goAbandonedShoppingCart" id="nl2goAbandonedShoppingCart_off" value="0" {if !$enable_add_product_to_cart}checked="checked"{/if}>
+                        <input type="radio" name="nl2goAbandonedShoppingCart" id="nl2goAbandonedShoppingCart_off" value="0" {if !$enable_abandoned_shopping_cart}checked="checked"{/if}>
                         <label for="nl2goAbandonedShoppingCart_off" class="radioCheck">{l s='No'}</label>
                         <a class="slide-button btn"></a>
                     </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-horizontal">
+    <div class="panel">
+        <div class="panel-heading"><i class="icon-cogs" style="margin-right: 10px"></i>{l s='testConnection' mod='newsletter2go'}</div>
+        <div class="form-wrapper">
+            <div class="form-group">
+                <label class="control-label col-lg-3" style="text-align: right;">
+                    <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="">
+                        {l s='Test connection to Newsletter2Go' mod='newsletter2go'}
+                    </span>
+                </label>
+                <div class="col-lg-9">
+                    <button type="button" class="btn btn-default" id="nl2goTestConnectionButton">
+                        {l s='testConnection' mod='newsletter2go'}
+                    </button>
                 </div>
             </div>
         </div>

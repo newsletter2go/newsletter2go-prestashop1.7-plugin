@@ -52,7 +52,7 @@ class Newsletter2GoCallbackModuleFrontController extends ModuleFrontController
         }
 
         if (!empty($userIntegrationId)) {
-            Configuration::updateValue('NEWSLETTER2GO_USERINTEGRATION_ID', $userIntegrationId);
+            Configuration::updateValue('NEWSLETTER2GO_USER_INTEGRATION_ID', $userIntegrationId);
         }
 
         die(json_encode(

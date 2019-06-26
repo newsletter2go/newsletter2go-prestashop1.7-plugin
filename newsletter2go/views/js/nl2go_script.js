@@ -28,6 +28,7 @@ window.addEventListener('load', function () {
         code = document.getElementById('code'),
         codeLoader = document.getElementById('codeLoader'),
         connect = document.getElementById('nl2goConnectButton'),
+        testConnection = document.getElementById('nl2goTestConnectionButton'),
         orderTrackingOn = document.getElementById('nl2goOrderTracking_on'),
         orderTrackingOff = document.getElementById('nl2goOrderTracking_off'),
         abandonedShoppingCartOn = document.getElementById('nl2goAbandonedShoppingCart_on'),
@@ -45,6 +46,26 @@ window.addEventListener('load', function () {
             };
 
         window.open(baseUrl + '?' + $.param(params), '_blank');
+    });
+
+    testConnection.addEventListener('click', function ajax() {
+        var xmlHttp = new XMLHttpRequest(),
+            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=testConnection';
+
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState == XMLHttpRequest.DONE) {
+                if (xmlHttp.status == 200) {
+                    testConnection.style.background = '#19d76e';
+                } else {
+                    testConnection.style.background = '#fc5f09';
+                    alert('An error occurred while testing API Connection to Newsletter2go, http code 200 expected.');
+                }
+            }
+        };
+
+        xmlHttp.open('POST', 'index.php', true);
+        xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xmlHttp.send(parameters);
     });
 
     generate.addEventListener('click', function ajax() {

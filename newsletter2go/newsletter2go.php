@@ -24,6 +24,8 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+include_once (dirname(__FILE__) . '/Service/Newsletter2goApiService.php');
+
 class Newsletter2Go extends Module
 {
     private $configNames = array(
@@ -33,9 +35,9 @@ class Newsletter2Go extends Module
         'ACCESS_TOKEN',
         'REFRESH_TOKEN',
         'COMPANY_ID',
-        'NEWSLETTER2GO_USERINTEGRATION_ID',
+        'USER_INTEGRATION_ID',
         'TRACKING_ORDER',
-        'NEWSLETTER2GO_ABANDONED_SHOPPING_CART',
+        'ABANDONED_SHOPPING_CART',
     );
 
     public function __construct()
@@ -129,7 +131,21 @@ class Newsletter2Go extends Module
                     'customer' => $customer
                 ];
 
-                echo json_encode($cartData);
+                $apiClient = new Newsletter2goApiService;
+                $endpoint = 'AbondandShoppingCart';
+                $testConnection = $apiClient->testConnection();
+
+                if($testConnection['status'] == 200){
+                    $response = $apiClient->httpRequest('POST', $endpoint, $cartData);
+                    echo json_encode($cartData);
+
+                    return $response;
+                }else{
+                    $apiClient->refreshToken();
+                    $response = $apiClient->httpRequest('POST', $endpoint, $cartData);
+
+                    return $response;
+                }
             }
         }
     }

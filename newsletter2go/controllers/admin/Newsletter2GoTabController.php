@@ -24,6 +24,8 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+include_once (dirname(__FILE__) . '/../../Service/Newsletter2goApiService.php');
+
 class Newsletter2GoTabController extends AdminController
 {
 
@@ -72,7 +74,7 @@ class Newsletter2GoTabController extends AdminController
             'page_header_toolbar_btn' => $this->page_header_toolbar_btn,
             'callback_url' => $this->context->link->getModuleLink('newsletter2go', 'Callback'),
             'enable_tracking' => isset($enableTracking) && $enableTracking === '1',
-            'enable_abandoned_shopping_cart' => isset($enableAbandonedShoppingCart) && $enableAbandonedShoppingCart === '1',
+            'enable_abandoned_shopping_cart' => isset($enableAbandonedShoppingCart) && $enableAbandonedShoppingCart === '1'
         ));
 
         $this->setTemplate('newsletter2go.tpl');
@@ -156,6 +158,14 @@ class Newsletter2GoTabController extends AdminController
         die($api_key);
     }
 
+    public function ajaxProcessTestConnection()
+    {
+        $apiClient = new Newsletter2goApiService;
+        $testConnection = $apiClient->testConnection();
+
+        die($testConnection);
+    }
+
     public function ajaxProcessTrackingOrder()
     {
         Configuration::updatevalue('NEWSLETTER2GO_TRACKING_ORDER', Tools::getValue('enable', '0'));
@@ -163,7 +173,7 @@ class Newsletter2GoTabController extends AdminController
         die();
     }
 
-    public function ajaxProcessAddProductToCart()
+    public function ajaxProcessAbandonedShoppingCart()
     {
         Configuration::updatevalue('NEWSLETTER2GO_ABANDONED_SHOPPING_CART', Tools::getValue('enable', '0'));
 
