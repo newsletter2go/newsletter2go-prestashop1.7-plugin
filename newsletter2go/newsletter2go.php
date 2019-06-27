@@ -37,7 +37,7 @@ class Newsletter2Go extends Module
         'COMPANY_ID',
         'USER_INTEGRATION_ID',
         'TRACKING_ORDER',
-        'ABANDONED_SHOPPING_CART',
+        'ABANDONED_SHOPPING_CART'
     );
 
     public function __construct()
@@ -132,17 +132,11 @@ class Newsletter2Go extends Module
                 ];
 
                 $apiClient = new Newsletter2goApiService;
-                $endpoint = 'AbondandShoppingCart';
+                $endpoint = '/users/integrations/'. Configuration::get('NEWSLETTER2GO_USER_INTEGRATION_ID') .'/cart/' . $cart->id;
                 $testConnection = $apiClient->testConnection();
 
                 if($testConnection['status'] == 200){
-                    $response = $apiClient->httpRequest('POST', $endpoint, $cartData);
-                    echo json_encode($cartData);
-
-                    return $response;
-                }else{
-                    $apiClient->refreshToken();
-                    $response = $apiClient->httpRequest('POST', $endpoint, $cartData);
+                    $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData);
 
                     return $response;
                 }
