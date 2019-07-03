@@ -124,10 +124,8 @@ class Newsletter2Go extends Module
 
                 $cartData = [
                     'id' => (string)$cart->id,
-                    'id_guest' => (string)$cart->id_guest,
-                    'shopName' => (string)$shop['name'],
                     'shopUrl' => (string)$shop['domain'],
-                    'productData' => $productData,
+                    'products' => $productData,
                     'customer' => $customer
                 ];
 
