@@ -101,13 +101,10 @@ class Newsletter2Go extends Module
             $cart = $params['cart'];
 
             if (isset($cart)) {
-
                 $shop = $this->context->shop->getShop($cart->id_shop);
-
                 $productData = [];
 
                 foreach ($cart->getProducts(true) as $products) {
-                    $product = [];
                     $product[] = [
                         'id' => (string)$products['id_product'],
                         'quantity' => (string)$products['quantity']
@@ -116,10 +113,10 @@ class Newsletter2Go extends Module
                     $productData = array_merge($productData, $product);
                 }
 
-                $customer = [];
-
                 if(isset($cart->id_customer) && $cart->id_customer != 0){
-                    $customer = $this->context->customer;
+                    $customer = [
+                        'email' => $this->context->customer->email
+                    ];
                 }
 
                 $cartData = [
@@ -131,15 +128,19 @@ class Newsletter2Go extends Module
 
                 $apiClient = new Newsletter2goApiService;
                 $endpoint = '/users/integrations/'. Configuration::get('NEWSLETTER2GO_USER_INTEGRATION_ID') .'/cart/' . $cart->id;
-                $testConnection = $apiClient->testConnection();
+                $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
+                $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
 
-                if($testConnection['status'] == 200){
-                    $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData);
-
-                    return $response;
+                if($apiClient->getLastStatusCode() === 401 || $apiClient->getLastStatusCode() === 403){
+                    $apiClient->refreshToken();
+                    $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
+                    $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
                 }
+
+                return $response['status'];
             }
         }
+        return false;
     }
 
     public function reset()

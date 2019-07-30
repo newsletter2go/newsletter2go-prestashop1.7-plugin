@@ -33,7 +33,7 @@ class Newsletter2GoCallbackModuleFrontController extends ModuleFrontController
         $accessToken = Tools::getValue('access_token', 0);
         $refreshToken = Tools::getValue('refresh_token', 0);
         $companyId = Tools::getValue('company_id', 0);
-        $userIntegrationId = Tools::getValue('userIntegratio_id', 0);
+        $userIntegrationId = Tools::getValue('user_integration_id', 0);
 
         if (!empty($authKey)) {
             Configuration::updateValue('NEWSLETTER2GO_AUTH_KEY', $authKey);

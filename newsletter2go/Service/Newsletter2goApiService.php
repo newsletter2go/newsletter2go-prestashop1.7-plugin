@@ -6,7 +6,7 @@ class Newsletter2goApiService
     const REFRESH_GRANT_TYPE = 'https://nl2go.com/jwt_refresh';
     const API_BASE_URL = 'https://api-staging.newsletter2go.com';
 
-    private $apiKey;
+    private $authKey;
     private $accessToken;
     private $refreshToken;
     private $lastStatusCode;
@@ -19,7 +19,7 @@ class Newsletter2goApiService
      */
     public function __construct()
     {
-        $this->apiKey =   Configuration::get('NEWSLETTER2GO_AUTH_KEY');
+        $this->authKey =   Configuration::get('NEWSLETTER2GO_AUTH_KEY');
         $this->accessToken =    Configuration::get('NEWSLETTER2GO_ACCESS_TOKEN');
         $this->refreshToken =    Configuration::get('NEWSLETTER2GO_REFRESH_TOKEN');
     }
@@ -46,14 +46,17 @@ class Newsletter2goApiService
 
             if ($authorize) {
                 // this is needed for refresh token
-                curl_setopt($ch, CURLOPT_USERPWD, $this->apiKey);
+                curl_setopt($ch, CURLOPT_USERPWD, $this->authKey);
             }
 
             switch ($method) {
-                case 'PATCH':
                 case 'POST':
                     curl_setopt($ch, CURLOPT_POST, true);
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+                    break;
+                case 'PATCH':
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
                     break;
                 case 'GET':
                     $encodedParams = array();
@@ -92,7 +95,13 @@ class Newsletter2goApiService
                 'grant_type' => self::REFRESH_GRANT_TYPE
             ];
 
-            $result = $this->httpRequest('POST', '/oauth/v2/token', $data, [], true);
+            $auth = base64_encode($this->authKey);
+            $headers = [
+                'Authorization' => 'Basic ' . $auth . '',
+                'Content-Type' => 'Content-Type: application/json',
+            ];
+
+            $result = $this->httpRequest('POST', '/oauth/v2/token', $data, $headers, true);
 
             if (isset($result['access_token'])) {
                 $this->setAccessToken($result['access_token']);
@@ -181,5 +190,4 @@ class Newsletter2goApiService
     {
         $this->lastStatusCode = $lastStatusCode;
     }
-
 }
