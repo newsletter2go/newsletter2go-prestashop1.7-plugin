@@ -188,6 +188,31 @@ class Newsletter2Go extends Module
         if (!empty($companyId) && Configuration::get('NEWSLETTER2GO_TRACKING_ORDER') === '1') {
             echo $this->getTrackingScript($params['order'], $companyId);
         }
+
+        $userIntegrationId = Configuration::get('NEWSLETTER2GO_USER_INTEGRATION_ID');
+        if (!empty($userIntegrationId) && Configuration::get('NEWSLETTER2GO_ABANDONED_SHOPPING_CART') === '1') {
+            $order = $params['order'];
+
+            $cartData = [
+                'id' => (string)$order->id_Cart,
+                'shopUrl' => '',
+                'products' => [],
+                'customer' => [ 'email' => '']
+            ];
+
+            $apiClient = new Newsletter2goApiService;
+            $endpoint = '/users/integrations/'. $userIntegrationId .'/cart/' . $order->id_cart;
+            $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
+            $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
+
+            if($apiClient->getLastStatusCode() === 401 || $apiClient->getLastStatusCode() === 403){
+                $apiClient->refreshToken();
+                $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
+                $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
+            }
+
+            return $response['status'];
+        }
     }
 
     /**
