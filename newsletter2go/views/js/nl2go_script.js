@@ -25,47 +25,25 @@
 
 window.addEventListener('load', function () {
     var generate = document.getElementById('nl2goGenerateButton'),
-        code = document.getElementById('code'),
-        codeLoader = document.getElementById('codeLoader'),
+        apiKey = document.getElementById('apiKey'),
+        apiKeyLoader = document.getElementById('apiKeyLoader'),
         connect = document.getElementById('nl2goConnectButton'),
-        testConnection = document.getElementById('nl2goTestConnectionButton'),
-        orderTrackingOn = document.getElementById('nl2goOrderTracking_on'),
-        orderTrackingOff = document.getElementById('nl2goOrderTracking_off'),
         abandonedShoppingCartOn = document.getElementById('nl2goAbandonedShoppingCart_on'),
-        abandonedShoppingCartOff = document.getElementById('nl2goAbandonedShoppingCart_off');
+        abandonedShoppingCartOff = document.getElementById('nl2goAbandonedShoppingCart_off'),
+        saveSettings = document.getElementById('nl2goSaveSettingsButton');
 
     connect.addEventListener('click', function () {
         var baseUrl = 'https://ui.newsletter2go.com/integrations/connect/PS17/',
             params = {
                 //ignore version to create latest version of connector
                 //version: document.getElementById("version").value,
-                apiKey: code.value,
+                apiKey: apiKey.value,
                 language: document.getElementById('language').value,
                 url: document.getElementById('base_url').value,
                 callback: document.getElementById("callback_url").value
             };
 
         window.open(baseUrl + '?' + $.param(params), '_blank');
-    });
-
-    testConnection.addEventListener('click', function ajax() {
-        var xmlHttp = new XMLHttpRequest(),
-            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=testConnection';
-
-        xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState == XMLHttpRequest.DONE) {
-                if (xmlHttp.status == 200) {
-                    testConnection.style.background = '#19d76e';
-                } else {
-                    testConnection.style.background = '#fc5f09';
-                    alert('An error occurred while testing API Connection to Newsletter2go, http code 200 expected.');
-                }
-            }
-        };
-
-        xmlHttp.open('POST', 'index.php', true);
-        xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xmlHttp.send(parameters);
     });
 
     generate.addEventListener('click', function ajax() {
@@ -75,13 +53,13 @@ window.addEventListener('load', function () {
         xmlHttp.onreadystatechange = function () {
             if (xmlHttp.readyState == XMLHttpRequest.DONE) {
                 if (xmlHttp.status == 200) {
-                    code.value = xmlHttp.responseText;
+                    apiKey.value = xmlHttp.responseText;
                 } else {
                     alert('An error occurred while generating new API key, http code 200 expected.');
                 }
 
-                codeLoader.style.display = 'none';
-                code.style.display = 'block';
+                apiKeyLoader.style.display = 'none';
+                apiKey.style.display = 'block';
             }
         };
 
@@ -90,36 +68,40 @@ window.addEventListener('load', function () {
         xmlHttp.send(parameters);
     });
 
-    orderTrackingOn.addEventListener('click', function ajax() {
-        var xmlHttp = new XMLHttpRequest(),
-            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=trackingOrder&enable=1';
-
-        xmlHttp.open('POST', 'index.php', true);
-        xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xmlHttp.send(parameters);
-    });
-
-    orderTrackingOff.addEventListener('click', function ajax() {
-        var xmlHttp = new XMLHttpRequest(),
-            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=trackingOrder&enable=0';
-
-        xmlHttp.open('POST', 'index.php', true);
-        xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xmlHttp.send(parameters);
-    });
-
     abandonedShoppingCartOn.addEventListener('click', function ajax() {
-        var xmlHttp = new XMLHttpRequest(),
-            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=abandonedShoppingCart&enable=1';
-
-        xmlHttp.open('POST', 'index.php', true);
-        xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xmlHttp.send(parameters);
+        $('#nl2goAbandonedShoppingCartSettings').show();
     });
 
     abandonedShoppingCartOff.addEventListener('click', function ajax() {
+        $('#nl2goAbandonedShoppingCartSettings').hide();
+    });
+
+    saveSettings.addEventListener('click', function ajax() {
+        var orderTrackingElement = document.getElementById('nl2goOrderTracking_on').checked;
+        var shoppingCartElement = document.getElementById('nl2goAbandonedShoppingCart_on').checked;
+        var orderTracking = 0;
+        var shoppingCart = 0;
         var xmlHttp = new XMLHttpRequest(),
-            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=abandonedShoppingCart&enable=0';
+            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=saveSettings';
+        var transactionalMailings = document.getElementById("nl2goTransactionMailing");
+        var transactionalMailingHandleTimes = document.getElementById("nl2goTransactionMailingHandleTime");
+
+        if(orderTrackingElement){
+            orderTracking = 1;
+        }
+        parameters = parameters.concat('&conversionTracking=' + orderTracking);
+
+        if(shoppingCartElement){
+            shoppingCart = 1;
+        }
+
+        parameters = parameters.concat('&shoppingCart=' + shoppingCart);
+
+        transactionalMailingId = transactionalMailings.options[transactionalMailings.selectedIndex].value;
+        parameters = parameters.concat('&transactionalMailingId=' + transactionalMailingId);
+
+        transactionalMailingHandleTime = transactionalMailingHandleTimes.options[transactionalMailingHandleTimes.selectedIndex].value;
+        parameters = parameters.concat('&transactionalMailingHandleTime=' + transactionalMailingHandleTime);
 
         xmlHttp.open('POST', 'index.php', true);
         xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');

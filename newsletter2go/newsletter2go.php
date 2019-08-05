@@ -126,16 +126,7 @@ class Newsletter2Go extends Module
                     'customer' => $customer
                 ];
 
-                $apiClient = new Newsletter2goApiService;
-                $endpoint = '/users/integrations/'. Configuration::get('NEWSLETTER2GO_USER_INTEGRATION_ID') .'/cart/' . $cart->id;
-                $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
-                $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
-
-                if($apiClient->getLastStatusCode() === 401 || $apiClient->getLastStatusCode() === 403){
-                    $apiClient->refreshToken();
-                    $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
-                    $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
-                }
+                $response = $this->sendCartData(Configuration::get('NEWSLETTER2GO_USER_INTEGRATION_ID'), $cart->id, $cartData);
 
                 return $response['status'];
             }
@@ -200,19 +191,26 @@ class Newsletter2Go extends Module
                 'customer' => [ 'email' => '']
             ];
 
-            $apiClient = new Newsletter2goApiService;
-            $endpoint = '/users/integrations/'. $userIntegrationId .'/cart/' . $order->id_cart;
-            $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
-            $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
-
-            if($apiClient->getLastStatusCode() === 401 || $apiClient->getLastStatusCode() === 403){
-                $apiClient->refreshToken();
-                $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
-                $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
-            }
+            $response = $this->sendCartData($userIntegrationId, $order->id_cart, $cartData);
 
             return $response['status'];
         }
+    }
+
+    private function sendCartData($userIntegrationId, $cartId, $cartData)
+    {
+        $apiClient = new Newsletter2goApiService;
+        $endpoint = '/users/integrations/'. $userIntegrationId .'/cart/' . $cartId;
+        $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
+        $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
+
+        if($apiClient->getLastStatusCode() === 401 || $apiClient->getLastStatusCode() === 403){
+            $apiClient->refreshToken();
+            $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
+            $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
+        }
+
+        return $response;
     }
 
     /**

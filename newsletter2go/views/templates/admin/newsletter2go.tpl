@@ -25,22 +25,57 @@
 
 {if isset($newsletter2go_error)}
     <div class="row">
-        <div class="col-lg-9" style="text-align: center; color: red;"><h2>{l s='Error: ' mod='newsletter2go'}{$newsletter2go_error|escape:'htmlall':'UTF-8'}</h2></div>
+        <div class="col-lg-9" style="text-align: center; color: red;">
+            <h2>{l s='Error: ' mod='newsletter2go'}{$newsletter2go_error|escape:'htmlall':'UTF-8'}</h2></div>
     </div>
 {/if}
 {if isset($newsletter2go_success_user)}
     <div class="row">
-        <div class="col-lg-9" style="text-align: center; color: #8bc954;"><h2>{$newsletter2go_success_user|escape:'htmlall':'UTF-8'}</h2></div>
+        <div class="col-lg-9" style="text-align: center; color: #8bc954;">
+            <h2>{$newsletter2go_success_user|escape:'htmlall':'UTF-8'}</h2></div>
     </div>
 {/if}
 {if isset($newsletter2go_success_integration)}
     <div class="row">
-        <div class="col-lg-9" style="text-align: center; color: #8bc954;"><h2>{$newsletter2go_success_integration|escape:'htmlall':'UTF-8'}</h2></div>
+        <div class="col-lg-9" style="text-align: center; color: #8bc954;">
+            <h2>{$newsletter2go_success_integration|escape:'htmlall':'UTF-8'}</h2></div>
     </div>
 {/if}
 <div class="form-horizontal">
     <div class="panel">
-        <div class="panel-heading"><i class="icon-cogs" style="margin-right: 10px"></i>{l s='Webservice Accounts' mod='newsletter2go'}</div>
+        <div class="panel-heading"><i class="icon-cogs"
+                                      style="margin-right: 10px"></i>{l s='Connection' mod='newsletter2go'}</div>
+        <div class="form-wrapper">
+            <div class="form-group" {if $test_connection}style="display: none"{/if}>
+                <label class="control-label col-lg-3" style="text-align: right;">
+                    <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="">
+                        {l s='Connect to Newsletter2Go' mod='newsletter2go'}
+                    </span>
+                </label>
+                <div class="col-lg-9">
+                    <input type="hidden" id="language" value="{$lang_iso|escape:'htmlall':'UTF-8'}">
+                    <input type="hidden" id="base_url" value="{$base_url|escape:'htmlall':'UTF-8'}">
+                    <input type="hidden" id="callback_url" value="{$callback_url|escape:'htmlall':'UTF-8'}">
+                    <input type="hidden" id="version" value="{$plugin_version|escape:'htmlall':'UTF-8'}">
+                    <button type="button" class="btn btn-default" id="nl2goConnectButton">
+                        {l s='Connection' mod='newsletter2go'}
+                    </button>
+                </div>
+            </div>
+            <div class="form-group" {if !$test_connection}style="display: none"{/if}>
+                <label class="control-label col-lg-3" style="text-align: right;">
+                    <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="">
+                        {l s='Connected to' mod='newsletter2go'}
+                    </span>
+                </label>
+                <div class="col-lg-3">
+                    <input type="text" name="company_name" id="company_name"
+                           value="{$company_name|escape:'htmlall':'UTF-8'}" readonly="true">
+                    <input type="text" name="company_bill_address" id="company_bill_address"
+                           value="{$company_bill_address|escape:'htmlall':'UTF-8'}" readonly="true">
+                </div>
+            </div>
+        </div>
         <div class="form-wrapper">
             <div class="form-group">
                 <label class="control-label col-lg-3 required" style="text-align: right;">
@@ -50,9 +85,10 @@
                 </label>
                 <div class="col-lg-9 ">
                     <div class="row">
-                        <div class="col-lg-5">
-                            <img src="../img/admin/ajax-loader.gif" alt="" id="codeLoader" style="display: none;" />
-                            <input type="text" name="key" id="code" value="{$web_services_api_key|escape:'htmlall':'UTF-8'}" readonly="true">
+                        <div class="col-lg-4">
+                            <img src="../img/admin/ajax-loader.gif" alt="" id="apiKeyLoader" style="display: none;"/>
+                            <input type="text" name="key" id="apiKey"
+                                   value="{$web_services_api_key|escape:'htmlall':'UTF-8'}" readonly="true">
                         </div>
                         <div class="col-lg-2">
                             <button type="button" class="btn btn-default" id="nl2goGenerateButton">
@@ -65,32 +101,11 @@
         </div>
     </div>
 </div>
-<div class="form-horizontal">
+<div class="form-horizontal" {if !$test_connection}style="display: none"{/if}>
     <div class="panel">
-        <div class="panel-heading"><i class="icon-cogs" style="margin-right: 10px"></i>{l s='Connect' mod='newsletter2go'}</div>
-        <div class="form-wrapper">
-            <div class="form-group">
-                <label class="control-label col-lg-3" style="text-align: right;">
-                    <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="">
-                        {l s='Connect to Newsletter2Go' mod='newsletter2go'}
-                    </span>
-                </label>
-                <div class="col-lg-9">
-                    <input type="hidden" id="language" value="{$lang_iso|escape:'htmlall':'UTF-8'}">
-                    <input type="hidden" id="base_url" value="{$base_url|escape:'htmlall':'UTF-8'}">
-                    <input type="hidden" id="callback_url" value="{$callback_url|escape:'htmlall':'UTF-8'}">
-                    <input type="hidden" id="version" value="{$plugin_version|escape:'htmlall':'UTF-8'}">
-                    <button type="button" class="btn btn-default" id="nl2goConnectButton">
-                        {l s='connect' mod='newsletter2go'}
-                    </button>
-                </div>
-            </div>
+        <div class="panel-heading"><i class="icon-cogs"
+                                      style="margin-right: 10px"></i>{l s='Features' mod='newsletter2go'}
         </div>
-    </div>
-</div>
-<div class="form-horizontal">
-    <div class="panel">
-        <div class="panel-heading"><i class="icon-cogs" style="margin-right: 10px"></i>{l s='Conversion Tracking' mod='newsletter2go'}</div>
         <div class="form-wrapper">
             <div class="form-group">
                 <label class="control-label col-lg-3" style="text-align: right;">
@@ -100,20 +115,19 @@
                 </label>
                 <div class="col-lg-9">
                     <span class="switch prestashop-switch fixed-width-lg">
-                        <input type="radio" name="nl2goOrderTracking" id="nl2goOrderTracking_on" value="1" {if $enable_tracking}checked="checked"{/if}>
+                        <input type="radio" name="nl2goOrderTracking" id="nl2goOrderTracking_on" value="1"
+                               {if $enable_tracking}checked="checked"{/if}>
                         <label for="nl2goOrderTracking_on" class="radioCheck">{l s='Yes'}</label>
-                        <input type="radio" name="nl2goOrderTracking" id="nl2goOrderTracking_off" value="0" {if !$enable_tracking}checked="checked"{/if}>
+                        <input type="radio" name="nl2goOrderTracking" id="nl2goOrderTracking_off" value="0"
+                               {if !$enable_tracking}checked="checked"{/if}>
                         <label for="nl2goOrderTracking_off" class="radioCheck">{l s='No'}</label>
                         <a class="slide-button btn"></a>
                     </span>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<div class="form-horizontal">
-    <div class="panel">
-        <div class="panel-heading"><i class="icon-cogs" style="margin-right: 10px"></i>{l s='Abandoned Shopping Cart' mod='newsletter2go'}</div>
+        <div class="panel-heading">
+        </div>
         <div class="form-wrapper">
             <div class="form-group">
                 <label class="control-label col-lg-3" style="text-align: right;">
@@ -123,33 +137,56 @@
                 </label>
                 <div class="col-lg-9">
                     <span class="switch prestashop-switch fixed-width-lg">
-                        <input type="radio" name="nl2goAbandonedShoppingCart" id="nl2goAbandonedShoppingCart_on" value="1" {if $enable_abandoned_shopping_cart}checked="checked"{/if}>
+                        <input type="radio" name="nl2goAbandonedShoppingCart" id="nl2goAbandonedShoppingCart_on"
+                               value="1" {if $enable_abandoned_shopping_cart}checked="checked"{/if}>
                         <label for="nl2goAbandonedShoppingCart_on" class="radioCheck">{l s='Yes'}</label>
-                        <input type="radio" name="nl2goAbandonedShoppingCart" id="nl2goAbandonedShoppingCart_off" value="0" {if !$enable_abandoned_shopping_cart}checked="checked"{/if}>
+                        <input type="radio" name="nl2goAbandonedShoppingCart" id="nl2goAbandonedShoppingCart_off"
+                               value="0" {if !$enable_abandoned_shopping_cart}checked="checked"{/if}>
                         <label for="nl2goAbandonedShoppingCart_off" class="radioCheck">{l s='No'}</label>
                         <a class="slide-button btn"></a>
                     </span>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="form-horizontal">
-    <div class="panel">
-        <div class="panel-heading"><i class="icon-cogs" style="margin-right: 10px"></i>{l s='testConnection' mod='newsletter2go'}</div>
-        <div class="form-wrapper">
-            <div class="form-group">
-                <label class="control-label col-lg-3" style="text-align: right;">
+                <div class="col-lg-9" id = "nl2goAbandonedShoppingCartSettings" {if !$enable_abandoned_shopping_cart}style="display: none"{/if}>
+                    <label class="control-label col-lg-3" style="text-align: right;">
                     <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="">
-                        {l s='Test connection to Newsletter2Go' mod='newsletter2go'}
+                        {l s='Transactional Mailing' mod='newsletter2go'}
                     </span>
-                </label>
-                <div class="col-lg-9">
-                    <button type="button" class="btn btn-default" id="nl2goTestConnectionButton">
-                        {l s='testConnection' mod='newsletter2go'}
-                    </button>
+                    </label>
+                    <div class="col-lg-4">
+                        <select id = "nl2goTransactionMailing">
+                        {foreach from=$transactionalMailings item="label" key="key"}
+                            <option value="{$key}" {if $key == $newsletter_id}selected="selected"{/if}>{$label}</option>
+                        {/foreach}
+                        </select>
+                    </div>
+                    <label class="control-label col-lg-3" style="text-align: right;">
+                    <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="" data-original-title="">
+                        {l s='Transactional Mailing' mod='newsletter2go'}
+                    </span>
+                    </label>
+                    <div class="col-lg-4">
+                        <select id = "nl2goTransactionMailingHandleTime">
+                            <option value="1">1 Hour</option>
+                            <option value="2">2 Hours</option>
+                            <option value="3">3 Hours</option>
+                            <option value="4">4 Hours</option>
+                            <option value="5">5 Hours</option>
+                            <option value="6">6 Hours</option>
+                            <option value="7">7 Hours</option>
+                            <option value="8">8 Hours</option>
+                            <option value="9">9 Hours</option>
+                            <option value="10">10 Hours</option>
+                            <option value="11">11 Hours</option>
+                            <option value="12">12 Hours</option>
+                        </select>
+                    </div>
                 </div>
             </div>
+        </div>
+        <div class="form-wrapper">
+            <button type="button" class="btn btn-default" id="nl2goSaveSettingsButton">
+                {l s='Save' mod='newsletter2go'}
+            </button>
         </div>
     </div>
 </div>

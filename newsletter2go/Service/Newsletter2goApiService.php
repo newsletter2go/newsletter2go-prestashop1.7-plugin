@@ -19,9 +19,9 @@ class Newsletter2goApiService
      */
     public function __construct()
     {
-        $this->authKey =   Configuration::get('NEWSLETTER2GO_AUTH_KEY');
-        $this->accessToken =    Configuration::get('NEWSLETTER2GO_ACCESS_TOKEN');
-        $this->refreshToken =    Configuration::get('NEWSLETTER2GO_REFRESH_TOKEN');
+        $this->authKey = Configuration::get('NEWSLETTER2GO_AUTH_KEY');
+        $this->accessToken = Configuration::get('NEWSLETTER2GO_ACCESS_TOKEN');
+        $this->refreshToken = Configuration::get('NEWSLETTER2GO_REFRESH_TOKEN');
     }
 
     /**
@@ -33,8 +33,13 @@ class Newsletter2goApiService
      * @param bool $authorize
      * @return array
      */
-    public function httpRequest($method, $endpoint, $params = [], $headers = ['Content-Type: application/json'], $authorize = false)
-    {
+    public function httpRequest(
+        $method,
+        $endpoint,
+        $params = [],
+        $headers = ['Content-Type: application/json'],
+        $authorize = false
+    ) {
         $response = [];
         $response['status'] = 0;
 
@@ -66,7 +71,7 @@ class Newsletter2goApiService
                         }
 
                         $getParams = "?" . http_build_query($params);
-                        $endpoint .= $endpoint . $getParams;
+                        $endpoint = $endpoint . $getParams;
                     }
                     break;
                 default:
@@ -97,8 +102,7 @@ class Newsletter2goApiService
 
             $auth = base64_encode($this->authKey);
             $headers = [
-                'Authorization' => 'Basic ' . $auth . '',
-                'Content-Type' => 'Content-Type: application/json',
+                'Authorization' => 'Basic ' . $auth . ''
             ];
 
             $result = $this->httpRequest('POST', '/oauth/v2/token', $data, $headers, true);
@@ -120,7 +124,7 @@ class Newsletter2goApiService
      */
     public function getAccessToken()
     {
-        $this->accessToken =  Configuration::get('NEWSLETTER2GO_ACCESS_TOKEN');
+        $this->accessToken = Configuration::get('NEWSLETTER2GO_ACCESS_TOKEN');
 
         return $this->accessToken;
     }
@@ -130,7 +134,7 @@ class Newsletter2goApiService
      */
     public function setAccessToken($accessToken)
     {
-        $this->accessToken =    Configuration::updateValue('NEWSLETTER2GO_ACCESS_TOKEN', $accessToken);
+        $this->accessToken = Configuration::updateValue('NEWSLETTER2GO_ACCESS_TOKEN', $accessToken);
     }
 
     /**
@@ -138,7 +142,7 @@ class Newsletter2goApiService
      */
     public function getRefreshToken()
     {
-        $this->refreshToken =  Configuration::get('NEWSLETTER2GO_REFRESH_TOKEN');
+        $this->refreshToken = Configuration::get('NEWSLETTER2GO_REFRESH_TOKEN');
 
         return $this->refreshToken;
     }
@@ -148,7 +152,7 @@ class Newsletter2goApiService
      */
     public function setRefreshToken($refreshToken)
     {
-        $this->refreshToken =  Configuration::updateValue('NEWSLETTER2GO_REFRESH_TOKEN', $refreshToken);;
+        $this->refreshToken = Configuration::updateValue('NEWSLETTER2GO_REFRESH_TOKEN', $refreshToken);;
     }
 
     public function testConnection()
@@ -158,12 +162,14 @@ class Newsletter2goApiService
         if ($this->getLastStatusCode() === 200) {
             $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $this->getAccessToken()];
 
-            $companyResult =  $this->httpRequest('GET', '/companies', [], $headers);
+            $companyResult = $this->httpRequest('GET', '/companies', [], $headers);
 
             return [
                 'status' => $companyResult['status'],
                 'account_id' => $refreshResult['account_id'],
-                'company_id' => $companyResult['value'][0]['id']
+                'company_id' => $companyResult['value'][0]['id'],
+                'company_name' => $companyResult['value'][0]['name'],
+                'company_bill_address' => $companyResult['value'][0]['bill_address']
             ];
 
         } else {
@@ -173,6 +179,73 @@ class Newsletter2goApiService
         $response['status'] = $this->getLastStatusCode();
 
         return $response;
+    }
+
+    public function getUserIntegration($userIntegrationId)
+    {
+        if ($this->getLastStatusCode() === 200) {
+            $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $this->getAccessToken()];
+
+            $userIntegrationResult = $this->httpRequest(
+                'GET',
+                '/users/integrations/' . $userIntegrationId,
+                [],
+                $headers
+            );
+
+            return $userIntegrationResult['value'][0];
+        }
+
+        $userIntegrationResult['status'] = $this->getLastStatusCode();
+
+        return $userIntegrationResult;
+    }
+
+    public function getTransactionalMailings($listId)
+    {
+        if ($this->getLastStatusCode() === 200) {
+            $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $this->getAccessToken()];
+
+            $params = [
+                '_fields' => 'id,name',
+                '_filter' => '(type=IN=("trigger","recurring","transaction","doi"));state=IN=("active");sub_type=IN=("transaction")'
+            ];
+
+            $transactionalMailingsResult = $this->httpRequest(
+                'GET',
+                '/lists/' . $listId . '/newsletters',
+                $params,
+                $headers
+            );
+
+            return $transactionalMailingsResult['value'];
+
+        }
+
+        $transactionalMailingsResult['status'] = $this->getLastStatusCode();
+
+        return $transactionalMailingsResult;
+    }
+
+    public function addTransactionMailingToUserIntegration($userIntegrationId, $transactionMailingId, $handleCartAfter)
+    {
+        $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $this->getAccessToken()];
+
+        $params = [
+            'newsletter_id' => $transactionMailingId,
+            'handle_cart_as_abandoned_after' => $handleCartAfter
+        ];
+
+        $result = $this->httpRequest(
+            'PATCH',
+            '/users/integrations/' . $userIntegrationId,
+            $params,
+            $headers
+        );
+
+        return [
+            'status' => $result['status'],
+        ];
     }
 
     /**

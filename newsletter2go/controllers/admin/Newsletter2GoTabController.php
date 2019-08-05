@@ -24,7 +24,7 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once (dirname(__FILE__) . '/../../Service/Newsletter2goApiService.php');
+include_once(dirname(__FILE__) . '/../../Service/Newsletter2goApiService.php');
 
 class Newsletter2GoTabController extends AdminController
 {
@@ -60,29 +60,64 @@ class Newsletter2GoTabController extends AdminController
             $api_key = $this->createNewServiceAccount();
         }
 
+        $apiClient = new Newsletter2goApiService;
+        $company = $apiClient->testConnection();
+        $testConnection = false;
+        if ($company['status'] === 200) {
+            $testConnection = true;
+            $companyName = $company['company_name'];
+            $companyBillAddress = $company['company_bill_address'];
+        }
+
+        $userIntegration = $apiClient->getUserIntegration(Configuration::get('NEWSLETTER2GO_USER_INTEGRATION_ID'));
+
+        if (isset($userIntegration)) {
+            $listId = $userIntegration['list_id'];
+            $newsletter_id = $userIntegration['newsletter_id'];
+
+            if (isset($listId)) {
+                $transactionalMailingsResponse = $apiClient->getTransactionalMailings($listId);
+                $transactionalMailings = [];
+                foreach ($transactionalMailingsResponse as $transactionalMailing) {
+                    $transactionalMailings[$transactionalMailing['id']] = $transactionalMailing['name'];
+                }
+            }
+        }
+
         $version = $this->getPluginVersion();
 
         $enableTracking = Configuration::get('NEWSLETTER2GO_TRACKING_ORDER');
         $enableAbandonedShoppingCart = Configuration::get('NEWSLETTER2GO_ABANDONED_SHOPPING_CART');
 
-        $this->context->smarty->assign(array(
-            'web_services_api_key' => $api_key,
-            'plugin_version' => $version,
-            'url_post' => self::$currentIndex . '&token=' . $this->token,
-            'show_page_header_toolbar' => $this->show_page_header_toolbar,
-            'page_header_toolbar_title' => $this->page_header_toolbar_title,
-            'page_header_toolbar_btn' => $this->page_header_toolbar_btn,
-            'callback_url' => $this->context->link->getModuleLink('newsletter2go', 'Callback'),
-            'enable_tracking' => isset($enableTracking) && $enableTracking === '1',
-            'enable_abandoned_shopping_cart' => isset($enableAbandonedShoppingCart) && $enableAbandonedShoppingCart === '1'
-        ));
+        $this->context->smarty->assign(
+            array(
+                'test_connection' => $testConnection,
+                'company_name' => isset($companyName),
+                'company_bill_address' => isset($companyBillAddress),
+                'list_id' => isset($listId),
+                'newsletter_id' => isset($newsletter_id),
+                'transactionalMailings' => isset($transactionalMailings),
+                'web_services_api_key' => $api_key,
+                'plugin_version' => $version,
+                'url_post' => self::$currentIndex . '&token=' . $this->token,
+                'show_page_header_toolbar' => $this->show_page_header_toolbar,
+                'page_header_toolbar_title' => $this->page_header_toolbar_title,
+                'page_header_toolbar_btn' => $this->page_header_toolbar_btn,
+                'callback_url' => $this->context->link->getModuleLink('newsletter2go', 'Callback'),
+                'enable_tracking' => isset($enableTracking) && $enableTracking === '1',
+                'enable_abandoned_shopping_cart' => isset($enableAbandonedShoppingCart) && $enableAbandonedShoppingCart === '1'
+            )
+        );
 
         $this->setTemplate('newsletter2go.tpl');
     }
 
     public function createTemplate($tpl_name)
     {
-        return $this->context->smarty->createTemplate(_PS_MODULE_DIR_ . $this->name . '/views/templates/admin/' . $tpl_name, $this->context->smarty);
+        return $this->context->smarty->createTemplate(
+            _PS_MODULE_DIR_ . $this->name . '/views/templates/admin/' . $tpl_name,
+            $this->context->smarty
+        );
     }
 
     public function checkAccess()
@@ -101,17 +136,23 @@ class Newsletter2GoTabController extends AdminController
         $resources = WebserviceRequest::getResources();
         $db_instance = Db::getInstance();
 
-        $db_instance->insert('webservice_account', array(
-            'key' => $api_key,
-            'active' => '1',
-        ));
+        $db_instance->insert(
+            'webservice_account',
+            array(
+                'key' => $api_key,
+                'active' => '1',
+            )
+        );
         $account_id = $db_instance->Insert_ID();
 
         $shop_id = (int)Context::getContext()->shop->id;
-        $db_instance->insert('webservice_account_shop', array(
-            'id_webservice_account' => $account_id,
-            'id_shop' => $shop_id,
-        ));
+        $db_instance->insert(
+            'webservice_account_shop',
+            array(
+                'id_webservice_account' => $account_id,
+                'id_shop' => $shop_id,
+            )
+        );
 
         $values = array(
             array(
@@ -158,24 +199,18 @@ class Newsletter2GoTabController extends AdminController
         die($api_key);
     }
 
-    public function ajaxProcessTestConnection()
+    public function ajaxProcessSaveSettings()
     {
+        Configuration::updatevalue('NEWSLETTER2GO_TRACKING_ORDER', Tools::getValue('conversionTracking'));
+        Configuration::updatevalue('NEWSLETTER2GO_ABANDONED_SHOPPING_CART', Tools::getValue('shoppingCart'));
+        $transactionalMailingId = Tools::getValue('transactionalMailingId');
+        $transactionalMailingHandleTime = Tools::getValue('transactionalMailingHandleTime');
         $apiClient = new Newsletter2goApiService;
-        $testConnection = $apiClient->testConnection();
-
-        die($testConnection);
-    }
-
-    public function ajaxProcessTrackingOrder()
-    {
-        Configuration::updatevalue('NEWSLETTER2GO_TRACKING_ORDER', Tools::getValue('enable', '0'));
-
-        die();
-    }
-
-    public function ajaxProcessAbandonedShoppingCart()
-    {
-        Configuration::updatevalue('NEWSLETTER2GO_ABANDONED_SHOPPING_CART', Tools::getValue('enable', '0'));
+        $apiClient->addTransactionMailingToUserIntegration(
+            Configuration::get('NEWSLETTER2GO_USER_INTEGRATION_ID'),
+            $transactionalMailingId,
+            $transactionalMailingHandleTime
+        );
 
         die();
     }
@@ -188,7 +223,7 @@ class Newsletter2GoTabController extends AdminController
     {
         $module = Module::getInstanceByName('newsletter2go');
 
-        $version =  str_replace('.', '', $module->version);
+        $version = str_replace('.', '', $module->version);
 
         return $version;
     }
