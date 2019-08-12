@@ -1,0 +1,109 @@
+.icon-Newsletter2GoTab:before {
+    content: url(https://www.newsletter2go.de/pr/150204_wordpress_icon.png);
+}
+
+
+.nl2go-switch {
+    position: relative;
+    display: inline-block;
+    min-width: 130px;
+    min-width: 8.125rem;
+    margin-top: 3px;
+    font-size: 13.008px;
+    font-size: .813rem;
+    background-color: #eff1f2;
+    border-radius: 1px;
+    text-align: center
+}
+
+.nl2go-switch input {
+    position: absolute;
+    opacity: 0
+}
+
+.nl2go-switch input:disabled + label {
+    cursor: not-allowed
+}
+
+.nl2go-switch input:disabled:checked + label {
+    background-color: #bbcdd2
+}
+
+.nl2go-switch label {
+    position: relative;
+    z-index: 2;
+    float: left;
+    width: 50%;
+    height: 100%;
+    padding: .231em .769em;
+    margin: 0;
+    vertical-align: middle;
+    text-align: center;
+    text-transform: uppercase;
+    color: #bbcdd2;
+    font-weight: 400;
+    cursor: pointer;
+    transition: color .2s ease-out
+}
+
+.nl2go-switch input:checked + label {
+    color: #fff
+}
+
+.nl2go-switch > .slide-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0;
+    z-index: 1;
+    width: 50%;
+    height: 100%;
+    color: #fff;
+    background-color: #c05c67;
+    transition: all .3s ease-out
+}
+
+.nl2go-switch input:last-of-type:checked ~ .slide-button {
+    background-color: #2eacce;
+    left: 50%
+}
+
+.nl2go-switch.nl2go-switch-sm {
+    min-width: 100px;
+    min-width: 6.25rem;
+    font-size: 12px;
+    font-size: .75rem
+}
+
+.nl2go-switch.nl2go-switch-lg {
+    font-size: 16px;
+    font-size: 1rem
+}
+
+.nl2go-help-box {
+    display: inline-block;
+    box-sizing: border-box;
+    color: #25b9d7;
+    background-color: #dff5f9;
+    height: 16px;
+    height: 1rem;
+    width: 16px;
+    width: 1rem;
+    font-weight: 700;
+    font-size: 10px;
+    line-height: 12px;
+    vertical-align: middle;
+    text-align: center;
+    border: 2px solid #25b9d7;
+    cursor: pointer;
+    padding: 0;
+    margin: 0 5px 2px
+}
+
+.nl2go-help-box:after {
+    content: "?"
+}
+
+.nl2go-help-box:focus {
+    outline: none
+}

@@ -136,7 +136,15 @@ class Newsletter2Go extends Module
 
     public function reset()
     {
-        //todo after reset our Plugin it´s not  able to be used or uninstalled
+        // Deactivate the previous API key
+        $account_id = Configuration::get('NEWSLETTER2GO_API_ACCOUNT');
+        $db_instance = Db::getInstance();
+        $db_instance->update('webservice_account', array('active' => '0'), 'id_webservice_account = ' . $account_id);
+
+        // Remove values from configuration
+        $this->deleteConfig();
+
+        return true;
     }
 
 
@@ -161,7 +169,7 @@ class Newsletter2Go extends Module
         $param = md5(time());
         $this->context->controller->addJS($this->_path . 'views/js/nl2go_script.js?param=' . $param, false);
         $this->context->controller->addCSS(
-            $this->_path . 'views/css/menuTabIcon.css?param=' . $param,
+            $this->_path . 'views/css/nl2go.css?param=' . $param,
             'all',
             null,
             false

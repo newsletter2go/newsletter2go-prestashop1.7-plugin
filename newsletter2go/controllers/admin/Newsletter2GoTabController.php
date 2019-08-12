@@ -59,25 +59,27 @@ class Newsletter2GoTabController extends AdminController
         if (!$api_key) {
             $api_key = $this->createNewServiceAccount();
         }
-
+        $listId = null;
+        $newsletterId = null;
+        $connectedCompany = null;
+        $transactionalMailings = [];
         $apiClient = new Newsletter2goApiService;
         $company = $apiClient->testConnection();
         $testConnection = false;
         if ($company['status'] === 200) {
             $testConnection = true;
-            $companyName = $company['company_name'];
-            $companyBillAddress = $company['company_bill_address'];
+            $connectedCompany = $company['company_name'] . ', ' . $company['company_bill_address'];
         }
 
         $userIntegration = $apiClient->getUserIntegration(Configuration::get('NEWSLETTER2GO_USER_INTEGRATION_ID'));
 
-        if (isset($userIntegration)) {
+        if (isset($userIntegration) && $apiClient->getLastStatusCode() === 200) {
             $listId = $userIntegration['list_id'];
-            $newsletter_id = $userIntegration['newsletter_id'];
+            $newsletterId = $userIntegration['newsletter_id'];
 
             if (isset($listId)) {
                 $transactionalMailingsResponse = $apiClient->getTransactionalMailings($listId);
-                $transactionalMailings = [];
+
                 foreach ($transactionalMailingsResponse as $transactionalMailing) {
                     $transactionalMailings[$transactionalMailing['id']] = $transactionalMailing['name'];
                 }
@@ -92,11 +94,10 @@ class Newsletter2GoTabController extends AdminController
         $this->context->smarty->assign(
             array(
                 'test_connection' => $testConnection,
-                'company_name' => isset($companyName),
-                'company_bill_address' => isset($companyBillAddress),
-                'list_id' => isset($listId),
-                'newsletter_id' => isset($newsletter_id),
-                'transactionalMailings' => isset($transactionalMailings),
+                'company' => $connectedCompany,
+                'list_id' => $listId,
+                'newsletter_id' => $newsletterId,
+                'transactionalMailings' => $transactionalMailings,
                 'web_services_api_key' => $api_key,
                 'plugin_version' => $version,
                 'url_post' => self::$currentIndex . '&token=' . $this->token,
@@ -211,6 +212,18 @@ class Newsletter2GoTabController extends AdminController
             $transactionalMailingId,
             $transactionalMailingHandleTime
         );
+
+        die();
+    }
+
+    public function ajaxProcessDisconnect()
+    {
+        Configuration::updatevalue('NEWSLETTER2GO_TRACKING_ORDER', 0);
+        Configuration::updatevalue('NEWSLETTER2GO_ABANDONED_SHOPPING_CART', 0);
+        Configuration::updatevalue('NEWSLETTER2GO_ACCESS_TOKEN', '');
+        Configuration::updatevalue('NEWSLETTER2GO_REFRESH_TOKEN', '');
+        Configuration::updatevalue('NEWSLETTER2GO_COMPANY_ID', '');
+        Configuration::updatevalue('NEWSLETTER2GO_USER_INTEGRATION_ID', '');
 
         die();
     }

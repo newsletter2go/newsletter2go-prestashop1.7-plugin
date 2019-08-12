@@ -28,6 +28,7 @@ window.addEventListener('load', function () {
         apiKey = document.getElementById('apiKey'),
         apiKeyLoader = document.getElementById('apiKeyLoader'),
         connect = document.getElementById('nl2goConnectButton'),
+        disconnect = document.getElementById('nl2goDisconnectButton'),
         abandonedShoppingCartOn = document.getElementById('nl2goAbandonedShoppingCart_on'),
         abandonedShoppingCartOff = document.getElementById('nl2goAbandonedShoppingCart_off'),
         saveSettings = document.getElementById('nl2goSaveSettingsButton');
@@ -44,6 +45,23 @@ window.addEventListener('load', function () {
             };
 
         window.open(baseUrl + '?' + $.param(params), '_blank');
+    });
+
+    disconnect.addEventListener('click', function () {
+        var xmlHttp = new XMLHttpRequest(),
+            parameters = 'token=token&ajax=a&tab=Newsletter2GoTab&action=disconnect';
+
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState == XMLHttpRequest.DONE) {
+                if (xmlHttp.status == 200) {
+                    location.reload();
+                }
+            }
+        };
+
+        xmlHttp.open('POST', 'index.php', true);
+        xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xmlHttp.send(parameters);
     });
 
     generate.addEventListener('click', function ajax() {
@@ -69,11 +87,11 @@ window.addEventListener('load', function () {
     });
 
     abandonedShoppingCartOn.addEventListener('click', function ajax() {
-        $('#nl2goAbandonedShoppingCartSettings').show();
+        $('.nl2goAbandonedShoppingCartSettings').show();
     });
 
     abandonedShoppingCartOff.addEventListener('click', function ajax() {
-        $('#nl2goAbandonedShoppingCartSettings').hide();
+        $('.nl2goAbandonedShoppingCartSettings').hide();
     });
 
     saveSettings.addEventListener('click', function ajax() {
@@ -103,8 +121,17 @@ window.addEventListener('load', function () {
         transactionalMailingHandleTime = transactionalMailingHandleTimes.options[transactionalMailingHandleTimes.selectedIndex].value;
         parameters = parameters.concat('&transactionalMailingHandleTime=' + transactionalMailingHandleTime);
 
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState == XMLHttpRequest.DONE) {
+                if (xmlHttp.status == 200) {
+                    location.reload();
+                }
+            }
+        };
+
         xmlHttp.open('POST', 'index.php', true);
         xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xmlHttp.send(parameters);
+
     });
 });
