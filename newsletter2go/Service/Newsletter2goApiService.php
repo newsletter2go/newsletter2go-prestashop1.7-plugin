@@ -4,7 +4,7 @@ class Newsletter2goApiService
 {
     const GRANT_TYPE = 'https://nl2go.com/jwt';
     const REFRESH_GRANT_TYPE = 'https://nl2go.com/jwt_refresh';
-    const API_BASE_URL = 'https://api-staging.newsletter2go.com';
+    const API_BASE_URL = 'https://api.newsletter2go.com';
 
     private $authKey;
     private $accessToken;
