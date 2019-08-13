@@ -62,6 +62,7 @@ class Newsletter2GoTabController extends AdminController
         $listId = null;
         $newsletterId = null;
         $connectedCompany = null;
+        $handleCartAfter = null;
         $transactionalMailings = [];
         $apiClient = new Newsletter2goApiService;
         $company = $apiClient->testConnection();
@@ -76,6 +77,7 @@ class Newsletter2GoTabController extends AdminController
         if (isset($userIntegration) && $apiClient->getLastStatusCode() === 200) {
             $listId = $userIntegration['list_id'];
             $newsletterId = $userIntegration['newsletter_id'];
+            $handleCartAfter = $userIntegration['handle_cart_as_abandoned_after'];
 
             if (isset($listId)) {
                 $transactionalMailingsResponse = $apiClient->getTransactionalMailings($listId);
@@ -98,6 +100,7 @@ class Newsletter2GoTabController extends AdminController
                 'list_id' => $listId,
                 'newsletter_id' => $newsletterId,
                 'transactionalMailings' => $transactionalMailings,
+                'handleCartAfter' => $handleCartAfter,
                 'web_services_api_key' => $api_key,
                 'plugin_version' => $version,
                 'url_post' => self::$currentIndex . '&token=' . $this->token,

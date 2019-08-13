@@ -190,30 +190,10 @@
                 </label>
                 <select id="nl2goTransactionMailingHandleTime" class="nl2goAbandonedShoppingCartSettings col-lg-6"
                         style="{if !$enable_abandoned_shopping_cart}display: none;{/if} margin-left: 3%;">
-                    <option value="1">1 Hour</option>
-                    <option value="2">2 Hours</option>
-                    <option value="3">3 Hours</option>
-                    <option value="4">4 Hours</option>
-                    <option value="5">5 Hours</option>
-                    <option value="6">6 Hours</option>
-                    <option value="7">7 Hours</option>
-                    <option value="8">8 Hours</option>
-                    <option value="9">9 Hours</option>
-                    <option value="10">10 Hours</option>
-                    <option value="11">11 Hours</option>
-                    <option value="12">12 Hours</option>
-                    <option value="13">13 Hour</option>
-                    <option value="14">14 Hours</option>
-                    <option value="15">15 Hours</option>
-                    <option value="16">16 Hours</option>
-                    <option value="17">17 Hours</option>
-                    <option value="18">18 Hours</option>
-                    <option value="19">19 Hours</option>
-                    <option value="20">20 Hours</option>
-                    <option value="21">21 Hours</option>
-                    <option value="22">22 Hours</option>
-                    <option value="23">23 Hours</option>
-                    <option value="24">24 Hours</option>
+                    {for $hour=1 to 24}
+                         {$value = $hour*60}
+                        <option {if $handleCartAfter == $value}selected="selected"{/if} value="{$value}">{$hour}</option>
+                    {/for}
                 </select>
             </div>
         </div>
