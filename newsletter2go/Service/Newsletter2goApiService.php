@@ -208,7 +208,7 @@ class Newsletter2goApiService
 
             $params = [
                 '_fields' => 'id,name',
-                '_filter' => '(type=IN=("transaction"));state=IN=("active");sub_type=IN=("shoppingCart")'
+                '_filter' => '(type=IN=("transaction"));state=IN=("active");sub_type=IN=("cart")'
             ];
 
             $transactionalMailingsResult = $this->httpRequest(
