@@ -24,16 +24,28 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+include_once (dirname(__FILE__) . '/Service/Newsletter2goApiService.php');
+
 class Newsletter2Go extends Module
 {
-    private $configNames = array('API_KEY', 'API_ACCOUNT', 'AUTH_KEY', 'ACCESS_TOKEN', 'REFRESH_TOKEN', 'COMPANY_ID', 'TRACKING_ORDER');
+    private $configNames = array(
+        'API_KEY',
+        'API_ACCOUNT',
+        'AUTH_KEY',
+        'ACCESS_TOKEN',
+        'REFRESH_TOKEN',
+        'COMPANY_ID',
+        'USER_INTEGRATION_ID',
+        'TRACKING_ORDER',
+        'ABANDONED_SHOPPING_CART'
+    );
 
     public function __construct()
     {
         $this->module_key = '0372c81a8fe76ebddb8ec637278afe98';
         $this->name = 'newsletter2go';
         $this->tab = 'advertising_marketing';
-        $this->version = '4.0.02';
+        $this->version = '4.1.00';
         $this->author = 'Newsletter2Go';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -41,7 +53,9 @@ class Newsletter2Go extends Module
         $this->controllers = array('Export', 'Callback');
         parent::__construct();
         $this->displayName = $this->l('Newsletter2Go email marketing');
-        $this->description = $this->l('Adds email marketing functionality to your E-commerce platform. Easily synchronize your contacts and send product newsletters');
+        $this->description = $this->l(
+            'Adds email marketing functionality to your E-commerce platform. Easily synchronize your contacts and send product newsletters'
+        );
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
         if (!Configuration::get('NEWSLETTER2GO_NAME')) {
             $this->warning = $this->l('No name provided');
@@ -55,9 +69,9 @@ class Newsletter2Go extends Module
         // Need a foreach for the language
         $tab->name[(int)Configuration::get('PS_LANG_DEFAULT')] = $this->l('Newsletter2Go');
         $tab->class_name = 'Newsletter2GoTab';
-		// Set parent tab id
+        // Set parent tab id
         $parent_id = (_PS_VERSION_ >= '1.7.0.0' ? (int)Tab::getIdFromClassName('CONFIGURE') : 0);
-		$tab->id_parent = $parent_id;
+        $tab->id_parent = $parent_id;
         $tab->module = $this->name;
         $tab->add();
 
@@ -70,8 +84,69 @@ class Newsletter2Go extends Module
         return parent::install()
             && $this->registerUrls()
             && $this->registerHook('backOfficeHeader')
-            && $this->registerHook('displayOrderConfirmation');
+            && $this->registerHook('displayOrderConfirmation')
+            && $this->registerHook('actionCartSave');
     }
+
+    /*
+     * this hook will be triggered when:
+     * - a product is added to the cart
+     * - product amount is increased or decreased
+     * - a product is deleted
+     * @param $params
+     */
+    public function hookActionCartSave($params)
+    {
+        if (Configuration::get('NEWSLETTER2GO_ABANDONED_SHOPPING_CART') === '1') {
+            $cart = $params['cart'];
+
+            if (isset($cart)) {
+                $shop = $this->context->shop->getShop($cart->id_shop);
+                $productData = [];
+
+                foreach ($cart->getProducts(true) as $products) {
+                    $product[] = [
+                        'id' => (string)$products['id_product'],
+                        'quantity' => (string)$products['quantity']
+                    ];
+
+                    $productData = array_merge($productData, $product);
+                }
+
+                if(isset($cart->id_customer) && $cart->id_customer != 0){
+                    $customer = [
+                        'email' => $this->context->customer->email
+                    ];
+                }
+
+                $cartData = [
+                    'id' => (string)$cart->id,
+                    'shopUrl' => (string)$shop['domain'],
+                    'products' => $productData,
+                    'customer' => $customer
+                ];
+
+                $response = $this->sendCartData(Configuration::get('NEWSLETTER2GO_USER_INTEGRATION_ID'), $cart->id, $cartData);
+
+                return $response['status'];
+            }
+        }
+        return false;
+    }
+
+    public function reset()
+    {
+        // Deactivate the previous API key
+        $account_id = Configuration::get('NEWSLETTER2GO_API_ACCOUNT');
+        $db_instance = Db::getInstance();
+        $db_instance->update('webservice_account', array('active' => '0'), 'id_webservice_account = ' . $account_id);
+
+        // Remove values from configuration
+        $this->deleteConfig();
+
+        return true;
+    }
+
 
     public function uninstall()
     {
@@ -93,7 +168,12 @@ class Newsletter2Go extends Module
     {
         $param = md5(time());
         $this->context->controller->addJS($this->_path . 'views/js/nl2go_script.js?param=' . $param, false);
-        $this->context->controller->addCSS($this->_path . 'views/css/menuTabIcon.css?param=' . $param, 'all', null, false);
+        $this->context->controller->addCSS(
+            $this->_path . 'views/css/nl2go.css?param=' . $param,
+            'all',
+            null,
+            false
+        );
     }
 
     /**
@@ -107,6 +187,38 @@ class Newsletter2Go extends Module
         if (!empty($companyId) && Configuration::get('NEWSLETTER2GO_TRACKING_ORDER') === '1') {
             echo $this->getTrackingScript($params['order'], $companyId);
         }
+
+        $userIntegrationId = Configuration::get('NEWSLETTER2GO_USER_INTEGRATION_ID');
+        if (!empty($userIntegrationId) && Configuration::get('NEWSLETTER2GO_ABANDONED_SHOPPING_CART') === '1') {
+            $order = $params['order'];
+
+            $cartData = [
+                'id' => (string)$order->id_Cart,
+                'shopUrl' => '',
+                'products' => [],
+                'customer' => [ 'email' => '']
+            ];
+
+            $response = $this->sendCartData($userIntegrationId, $order->id_cart, $cartData);
+
+            return $response['status'];
+        }
+    }
+
+    private function sendCartData($userIntegrationId, $cartId, $cartData)
+    {
+        $apiClient = new Newsletter2goApiService;
+        $endpoint = '/users/integrations/'. $userIntegrationId .'/cart/' . $cartId;
+        $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
+        $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
+
+        if($apiClient->getLastStatusCode() === 401 || $apiClient->getLastStatusCode() === 403){
+            $apiClient->refreshToken();
+            $headers = ['Content-Type: application/json', 'Authorization: Bearer ' . $apiClient->getAccessToken()];
+            $response = $apiClient->httpRequest('PATCH', $endpoint, $cartData, $headers);
+        }
+
+        return $response;
     }
 
     /**
